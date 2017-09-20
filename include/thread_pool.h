@@ -10,6 +10,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include <condition_variable>
 
 class thread_pool {
@@ -26,6 +27,7 @@ private:
     std::vector<std::thread> _threads;
     std::condition_variable _cond_variable;
     std::mutex _mutex;
+    std::atomic_bool _finished;
 
     std::queue<task_t> _tasks;
 };

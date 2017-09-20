@@ -4,29 +4,37 @@
 
 #include "thread_pool.h"
 
-#include <mutex>
-
 thread_pool::thread_pool(int32_t num_threads)
     : _num_threads(num_threads)
+    , _finished(false)
 {
     for (int32_t i = 0; i < _num_threads; ++i) {
         _threads.emplace_back([this]() {
-            task_t task;
-            {
-                std::unique_lock<std::mutex> ul(_mutex);
-                _cond_variable.wait(ul, [this]{ return !_tasks.empty(); });
+            while (!_finished) {
+                task_t task;
 
-                task = _tasks.front();
-                _tasks.pop();
+                {
+                    std::unique_lock<std::mutex> ul(_mutex);
+                    _cond_variable.wait(ul, [this]{ return !_tasks.empty() || _finished; });
+
+                    if (!_finished) {
+                        task = _tasks.front();
+                        _tasks.pop();
+                    }
+                }
+
+                if (!_finished) {
+                    task();
+                }
             }
-
-            task();
         });
     }
 }
 
 thread_pool::~thread_pool()
 {
+    _finished = true;
+    _cond_variable.notify_all();
     for (std::thread & t: _threads) {
         t.join();
     }
