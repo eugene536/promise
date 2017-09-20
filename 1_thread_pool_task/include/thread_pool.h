@@ -23,7 +23,6 @@ public:
     void execute(task_t const & task);
 
 private:
-    int32_t _num_threads;
     std::vector<std::thread> _threads;
     std::condition_variable _cond_variable;
     std::mutex _mutex;

@@ -5,11 +5,10 @@
 #include "thread_pool.h"
 
 thread_pool::thread_pool(int32_t num_threads)
-    : _num_threads(num_threads)
-    , _finished(false)
+    : _finished(false)
 {
-    for (int32_t i = 0; i < _num_threads; ++i) {
-        _threads.emplace_back([this]() {
+    for (int32_t i = 0; i < num_threads; ++i) {
+        _threads.emplace_back([this] {
             while (!_finished) {
                 task_t task;
 
@@ -17,15 +16,15 @@ thread_pool::thread_pool(int32_t num_threads)
                     std::unique_lock<std::mutex> ul(_mutex);
                     _cond_variable.wait(ul, [this]{ return !_tasks.empty() || _finished; });
 
-                    if (!_finished) {
-                        task = _tasks.front();
-                        _tasks.pop();
+                    if (_finished) {
+                        return;
                     }
+
+                    task = _tasks.front();
+                    _tasks.pop();
                 }
 
-                if (!_finished) {
-                    task();
-                }
+                task();
             }
         });
     }
