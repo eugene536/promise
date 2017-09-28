@@ -1,5 +1,5 @@
 //
-// Created by eugene on 21.9.2017
+// Created by eugene on 28.9.2017
 //
 #ifdef _GTEST
 
@@ -8,21 +8,6 @@
 
 #include <thread>
 #include <gtest/gtest.h>
-
-TEST(promise, GetFuture_int) {
-    Promise<int> promise;
-    Future<int> f = promise.GetFuture();
-}
-
-TEST(promise, GetFuture_int_ampersand) {
-    Promise<int &> promise;
-    Future<int &> f = promise.GetFuture();
-}
-
-TEST(promise, GetFuture_void) {
-    Promise<void> promise;
-    Future<void> f = promise.GetFuture();
-}
 
 TEST(promise, IsReady) {
     Promise<int> promise;
