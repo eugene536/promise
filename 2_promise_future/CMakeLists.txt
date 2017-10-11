@@ -1,4 +1,4 @@
-project(promise_future)
+project(future_promise)
 cmake_minimum_required(VERSION 3.2)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pedantic -Wall -Wextra -Wno-char-subscripts -Wno-unused-result -g -fsanitize=thread")
@@ -13,10 +13,16 @@ file(GLOB_RECURSE HEADER_FILES include/*.h tests/*.h)
 
 include_directories(include)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+set(3D_PARTY_HOME ${CMAKE_CURRENT_SOURCE_DIR}/../3dparty)
+
+#set(ENV{GTEST} y)
+
 if ("$ENV{GTEST}" STREQUAL "y")
     message("!Gtests're enabled!")
 
-    find_package(GTest REQUIRED)
+    include_directories(${3D_PARTY_HOME}/googletest-1.8.0)
+    link_directories(${3D_PARTY_HOME}/googletest-1.8.0)
 
     include_directories(tests)
     add_definitions(-D_GTEST)
@@ -25,7 +31,7 @@ endif ()
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
 if ("$ENV{GTEST}" STREQUAL "y")
-    target_link_libraries(${PROJECT_NAME} ${GTEST_BOTH_LIBRARIES} gmock)
+    target_link_libraries(${PROJECT_NAME} googletest)
 endif ()
 
 target_link_libraries(${PROJECT_NAME} pthread)

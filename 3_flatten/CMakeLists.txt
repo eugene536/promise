@@ -12,6 +12,7 @@ file(GLOB_RECURSE SOURCE_FILES source/*.cpp tests/*.cpp)
 file(GLOB_RECURSE HEADER_FILES include/*.h tests/*.h)
 
 include_directories(include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../2_promise_future/include)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 set(3D_PARTY_HOME ${CMAKE_CURRENT_SOURCE_DIR}/../3dparty)
