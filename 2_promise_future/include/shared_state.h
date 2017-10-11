@@ -22,6 +22,7 @@ struct shared_state_base {
 
     void set_promise_died() {
         _is_promise_alive = false;
+        _cond_var.notify_all();
     }
 
     bool is_ready() const {
@@ -35,7 +36,11 @@ struct shared_state_base {
             throw std::runtime_error("promise has already died");
         }
 
-        _cond_var.wait(lock, [this] { return bool(_is_ready); });
+        _cond_var.wait(lock, [this] { return bool(_is_ready) || !_is_promise_alive; });
+
+        if (!_is_promise_alive && !is_ready()) {
+            throw std::runtime_error("promise has already died");
+        }
     }
 
 protected:
@@ -49,6 +54,12 @@ template<typename T>
 struct shared_state
     : shared_state_base
 {
+    shared_state() = default;
+
+    shared_state(T const & value)
+        : _value(value)
+    {}
+
     void set(T const & value) {
         {
             std::unique_lock<std::mutex> lock(_mutex);
